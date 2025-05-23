@@ -23,7 +23,7 @@ const LoginForm = () => {
       if (success) {
         toast({
           title: "Login Successful",
-          description: "Welcome to the Coding Questions Platform!",
+          description: "Welcome to Code Grad!",
         });
       } else {
         toast({
@@ -50,7 +50,7 @@ const LoginForm = () => {
           <div className="mx-auto w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
             <LogIn className="w-6 h-6 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold text-white">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl font-bold text-white">Welcome to Code Grad</CardTitle>
           <CardDescription className="text-slate-400">
             Sign in to access the coding questions platform
           </CardDescription>

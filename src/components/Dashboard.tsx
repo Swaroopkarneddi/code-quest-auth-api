@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { apiService, QuestionSummary } from '@/lib/api';
@@ -116,7 +115,7 @@ const Dashboard = () => {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <Settings className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-xl font-bold text-white">Coding Questions Platform</h1>
+              <h1 className="text-xl font-bold text-white">Code Grad</h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-slate-300">Welcome, {user?.role}</span>

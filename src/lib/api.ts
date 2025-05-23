@@ -56,20 +56,38 @@ export class ApiService {
   }
 
   async addNewQuestion(token: string, question: Question): Promise<boolean> {
+    // Ensure question format matches the expected API format
+    const formattedQuestion = {
+      ...question,
+      "question### Description ": question.questionDescription, // Adjust the field name to match API format
+    };
+    
+    // Remove the questionDescription field as it's not in the API format
+    delete formattedQuestion.questionDescription;
+    
     const response = await fetch(`${this.baseUrl}/addNewQuestion`, {
       method: 'POST',
       headers: this.getAuthHeaders(token),
-      body: JSON.stringify(question),
+      body: JSON.stringify(formattedQuestion),
     });
 
     return response.ok;
   }
 
   async updateQuestion(token: string, question: Question): Promise<Question | null> {
+    // Ensure question format matches the expected API format
+    const formattedQuestion = {
+      ...question,
+      "question### Description ": question.questionDescription, // Adjust the field name to match API format
+    };
+    
+    // Remove the questionDescription field as it's not in the API format
+    delete formattedQuestion.questionDescription;
+    
     const response = await fetch(`${this.baseUrl}/updateQuestion`, {
       method: 'PUT',
       headers: this.getAuthHeaders(token),
-      body: JSON.stringify(question),
+      body: JSON.stringify(formattedQuestion),
     });
 
     if (response.ok) {
