@@ -55,6 +55,33 @@ export class ApiService {
     throw new Error('Failed to fetch questions');
   }
 
+  async getQuestionById(token: string, questionId: number): Promise<Question> {
+    const response = await fetch(`${this.baseUrl}/getQuestionById?questionId=${questionId}`, {
+      method: 'GET',
+      headers: this.getAuthHeaders(token),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Transform the data to match our internal format
+      return {
+        id: data.id,
+        questionId: data.questionId,
+        questionName: data.questionName,
+        questionDescription: data["question### Description "] || "",
+        constraints: data.constraints || [],
+        sampleTestCases: data.sampleTestCases || [],
+        actualTestCases: data.actualTestCases || [],
+        topics: data.topics || [],
+        questionDifficulty: data.questionDifficulty,
+        questionSource: data.questionSource,
+        questionSolutions: data.questionSolutions || []
+      };
+    }
+    throw new Error(`Failed to fetch question with ID ${questionId}`);
+  }
+
   async addNewQuestion(token: string, question: Question): Promise<boolean> {
     // Ensure question format matches the expected API format
     const formattedQuestion = {

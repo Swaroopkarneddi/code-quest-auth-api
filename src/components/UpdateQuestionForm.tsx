@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { apiService, Question, QuestionSummary, TestCase, Solution } from '@/lib/api';
@@ -7,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Plus, Trash } from 'lucide-react';
+import { ArrowLeft, Plus, Trash, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -20,8 +19,9 @@ interface UpdateQuestionFormProps {
 const UpdateQuestionForm: React.FC<UpdateQuestionFormProps> = ({ question, onBack, onSuccess }) => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Question>({
     id: '',
     questionId: question.questionId,
     questionName: question.questionName,
@@ -34,6 +34,49 @@ const UpdateQuestionForm: React.FC<UpdateQuestionFormProps> = ({ question, onBac
     questionSource: 'LeetCode' as 'LeetCode' | 'CodeForces',
     questionSolutions: [{ name: '', explanation: '', example: '', code: '' }] as Solution[]
   });
+
+  // Fetch complete question data when component mounts
+  useEffect(() => {
+    const fetchQuestionData = async () => {
+      if (!user?.jwt) return;
+      
+      try {
+        setIsFetching(true);
+        const fullQuestion = await apiService.getQuestionById(user.jwt, question.questionId);
+        
+        // Update form data with the fetched question
+        setFormData({
+          id: fullQuestion.id || '',
+          questionId: fullQuestion.questionId || question.questionId,
+          questionName: fullQuestion.questionName,
+          questionDescription: fullQuestion.questionDescription || '',
+          constraints: fullQuestion.constraints.length ? fullQuestion.constraints : [''],
+          sampleTestCases: fullQuestion.sampleTestCases.length ? 
+            fullQuestion.sampleTestCases : 
+            [{ input: '', output: '', explanation: '' }],
+          actualTestCases: fullQuestion.actualTestCases.length ? 
+            fullQuestion.actualTestCases : 
+            [{ input: '', output: '', explanation: '' }],
+          topics: fullQuestion.topics.length ? fullQuestion.topics : [''],
+          questionDifficulty: fullQuestion.questionDifficulty,
+          questionSource: fullQuestion.questionSource,
+          questionSolutions: fullQuestion.questionSolutions.length ? 
+            fullQuestion.questionSolutions : 
+            [{ name: '', explanation: '', example: '', code: '' }]
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch question details. Using summary data instead.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchQuestionData();
+  }, [question.questionId, user?.jwt]);
 
   // Helper functions for handling arrays of data
   const handleArrayChange = <T extends unknown>(
@@ -124,6 +167,19 @@ const UpdateQuestionForm: React.FC<UpdateQuestionFormProps> = ({ question, onBac
     }
   };
 
+  if (isFetching) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4 flex items-center justify-center">
+        <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm max-w-md w-full">
+          <CardContent className="pt-6 flex flex-col items-center justify-center space-y-4">
+            <Loader2 className="h-8 w-8 text-blue-400 animate-spin" />
+            <p className="text-slate-300">Loading question data...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
       <div className="max-w-4xl mx-auto">
@@ -139,7 +195,7 @@ const UpdateQuestionForm: React.FC<UpdateQuestionFormProps> = ({ question, onBac
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
-              <CardTitle className="text-2xl font-bold text-white">Update Question</CardTitle>
+              <CardTitle className="text-2xl font-bold text-white">Update Question #{formData.questionId}</CardTitle>
             </div>
           </CardHeader>
           <CardContent>
