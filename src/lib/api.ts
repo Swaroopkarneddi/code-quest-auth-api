@@ -56,7 +56,7 @@ export class ApiService {
   }
 
   async getQuestionById(token: string, questionId: number): Promise<Question> {
-    const response = await fetch(`${this.baseUrl}/getQuestionById?questionId=${questionId}`, {
+    const response = await fetch(`${this.baseUrl}/getQuestionById/${questionId}`, {
       method: 'GET',
       headers: this.getAuthHeaders(token),
     });
