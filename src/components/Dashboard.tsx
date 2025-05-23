@@ -1,25 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { apiService, QuestionSummary } from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LogOut, Plus, Search, Settings } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import AddQuestionForm from './AddQuestionForm';
-import UpdateQuestionForm from './UpdateQuestionForm';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { apiService, QuestionSummary } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { LogOut, Plus, Search, Settings } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import AddQuestionForm from "./AddQuestionForm";
+import UpdateQuestionForm from "./UpdateQuestionForm";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const [questions, setQuestions] = useState<QuestionSummary[]>([]);
-  const [filteredQuestions, setFilteredQuestions] = useState<QuestionSummary[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
+  const [filteredQuestions, setFilteredQuestions] = useState<QuestionSummary[]>(
+    []
+  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState<string>("all");
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'add' | 'update'>('dashboard');
-  const [selectedQuestion, setSelectedQuestion] = useState<QuestionSummary | null>(null);
+  const [activeTab, setActiveTab] = useState<"dashboard" | "add" | "update">(
+    "dashboard"
+  );
+  const [selectedQuestion, setSelectedQuestion] =
+    useState<QuestionSummary | null>(null);
 
   useEffect(() => {
     fetchQuestions();
@@ -31,7 +48,7 @@ const Dashboard = () => {
 
   const fetchQuestions = async () => {
     if (!user?.jwt) return;
-    
+
     try {
       const questionsData = await apiService.getAllQuestionNames(user.jwt);
       setQuestions(questionsData);
@@ -50,14 +67,19 @@ const Dashboard = () => {
     let filtered = questions;
 
     if (searchTerm) {
-      filtered = filtered.filter(q => 
-        q.questionName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        q.topics.some(topic => topic.toLowerCase().includes(searchTerm.toLowerCase()))
+      filtered = filtered.filter(
+        (q) =>
+          q.questionName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          q.topics.some((topic) =>
+            topic.toLowerCase().includes(searchTerm.toLowerCase())
+          )
       );
     }
 
-    if (difficultyFilter !== 'all') {
-      filtered = filtered.filter(q => q.questionDifficulty === difficultyFilter);
+    if (difficultyFilter !== "all") {
+      filtered = filtered.filter(
+        (q) => q.questionDifficulty === difficultyFilter
+      );
     }
 
     setFilteredQuestions(filtered);
@@ -65,10 +87,14 @@ const Dashboard = () => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'EASY': return 'bg-green-600';
-      case 'MEDIUM': return 'bg-yellow-600';
-      case 'HARD': return 'bg-red-600';
-      default: return 'bg-gray-600';
+      case "EASY":
+        return "bg-green-600";
+      case "MEDIUM":
+        return "bg-yellow-600";
+      case "HARD":
+        return "bg-red-600";
+      default:
+        return "bg-gray-600";
     }
   };
 
@@ -80,25 +106,25 @@ const Dashboard = () => {
     });
   };
 
-  if (activeTab === 'add') {
+  if (activeTab === "add") {
     return (
-      <AddQuestionForm 
-        onBack={() => setActiveTab('dashboard')} 
+      <AddQuestionForm
+        onBack={() => setActiveTab("dashboard")}
         onSuccess={() => {
-          setActiveTab('dashboard');
+          setActiveTab("dashboard");
           fetchQuestions();
         }}
       />
     );
   }
 
-  if (activeTab === 'update' && selectedQuestion) {
+  if (activeTab === "update" && selectedQuestion) {
     return (
-      <UpdateQuestionForm 
+      <UpdateQuestionForm
         question={selectedQuestion}
-        onBack={() => setActiveTab('dashboard')} 
+        onBack={() => setActiveTab("dashboard")}
         onSuccess={() => {
-          setActiveTab('dashboard');
+          setActiveTab("dashboard");
           fetchQuestions();
         }}
       />
@@ -112,7 +138,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                 <Settings className="w-5 h-5 text-white" />
               </div>
               <h1 className="text-xl font-bold text-white">Code Grad</h1>
@@ -123,7 +149,7 @@ const Dashboard = () => {
                 onClick={handleLogout}
                 variant="outline"
                 size="sm"
-                className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                className="bg-green-600 text-white hover:bg-green-700 border-green-600"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -156,9 +182,9 @@ const Dashboard = () => {
               <SelectItem value="HARD">Hard</SelectItem>
             </SelectContent>
           </Select>
-          <Button 
-            onClick={() => setActiveTab('add')}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+          <Button
+            onClick={() => setActiveTab("add")}
+            className="bg-green-600 hover:bg-green-700 text-white"
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Question
@@ -169,14 +195,19 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-8">
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
-              <div className="text-2xl font-bold text-white">{questions.length}</div>
+              <div className="text-2xl font-bold text-white">
+                {questions.length}
+              </div>
               <div className="text-slate-400">Total Questions</div>
             </CardContent>
           </Card>
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-green-400">
-                {questions.filter(q => q.questionDifficulty === 'EASY').length}
+                {
+                  questions.filter((q) => q.questionDifficulty === "EASY")
+                    .length
+                }
               </div>
               <div className="text-slate-400">Easy</div>
             </CardContent>
@@ -184,7 +215,10 @@ const Dashboard = () => {
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-yellow-400">
-                {questions.filter(q => q.questionDifficulty === 'MEDIUM').length}
+                {
+                  questions.filter((q) => q.questionDifficulty === "MEDIUM")
+                    .length
+                }
               </div>
               <div className="text-slate-400">Medium</div>
             </CardContent>
@@ -192,7 +226,10 @@ const Dashboard = () => {
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="text-2xl font-bold text-red-400">
-                {questions.filter(q => q.questionDifficulty === 'HARD').length}
+                {
+                  questions.filter((q) => q.questionDifficulty === "HARD")
+                    .length
+                }
               </div>
               <div className="text-slate-400">Hard</div>
             </CardContent>
@@ -207,11 +244,20 @@ const Dashboard = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredQuestions.map((question) => (
-              <Card key={question.questionId} className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors">
+              <Card
+                key={question.questionId}
+                className="bg-slate-800/50 border-slate-700 hover:bg-slate-800/70 transition-colors"
+              >
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <CardTitle className="text-white text-lg">{question.questionName}</CardTitle>
-                    <Badge className={`${getDifficultyColor(question.questionDifficulty)} text-white`}>
+                    <CardTitle className="text-white text-lg">
+                      {question.questionName}
+                    </CardTitle>
+                    <Badge
+                      className={`${getDifficultyColor(
+                        question.questionDifficulty
+                      )} text-white`}
+                    >
                       {question.questionDifficulty}
                     </Badge>
                   </div>
@@ -222,7 +268,11 @@ const Dashboard = () => {
                 <CardContent>
                   <div className="flex flex-wrap gap-2 mb-4">
                     {question.topics.map((topic, index) => (
-                      <Badge key={index} variant="outline" className="border-slate-600 text-slate-300">
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="border-slate-600 text-slate-300"
+                      >
                         {topic}
                       </Badge>
                     ))}
@@ -230,11 +280,11 @@ const Dashboard = () => {
                   <Button
                     onClick={() => {
                       setSelectedQuestion(question);
-                      setActiveTab('update');
+                      setActiveTab("update");
                     }}
                     variant="outline"
                     size="sm"
-                    className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+                    className="w-full bg-green-600 text-white hover:bg-green-700 border-green-600"
                   >
                     Update Question
                   </Button>
@@ -246,7 +296,9 @@ const Dashboard = () => {
 
         {filteredQuestions.length === 0 && !isLoading && (
           <div className="text-center py-8">
-            <div className="text-slate-400">No questions found matching your criteria.</div>
+            <div className="text-slate-400">
+              No questions found matching your criteria.
+            </div>
           </div>
         )}
       </div>
